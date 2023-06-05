@@ -1,23 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
+import { FilterBookDto } from './dto/filter-book.dto';
 
 @Injectable()
 export class BooksService {
   private books: any[] = [];
 
-  getBooks(title: string, author: string, category: string): any[] {
+  getBooks(filter: FilterBookDto): any[] {
+    const { title, author, category, min_year, max_year } = filter;
     const books = this.books.filter((book) => {
-      let isMatch = true;
       if (title && book.title != title) {
-        isMatch = false;
+        return false;
       }
       if (author && book.author != author) {
-        isMatch = false;
+        return false;
       }
       if (category && book.category != category) {
-        isMatch = false;
+        return false;
       }
-      return isMatch;
+      if (min_year && book.year < min_year) {
+        return false;
+      }
+      if (max_year && book.year > max_year) {
+        return false;
+      }
+      return true;
     });
     return books;
   }
@@ -37,23 +46,19 @@ export class BooksService {
   }
 
   // create a Book
-  createBook(title: string, author: string, category: string) {
-    const book = {
-      id: uuidv4(),
-      title,
-      author,
-      category,
-    };
-    this.books.push(book);
-    return book;
+  createBook(createBookDto: CreateBookDto) {
+    const { title, author, category, year } = createBookDto;
+    this.books.push({ id: uuidv4(), title, author, category, year });
   }
 
   // update a Book
-  updateBook(id: string, title: string, author: string, category: string) {
+  updateBook(id: string, updateBookDto: UpdateBookDto) {
+    const { title, author, category, year } = updateBookDto;
     const bookIdx = this.findBookById(id);
     this.books[bookIdx].title = title;
     this.books[bookIdx].author = author;
     this.books[bookIdx].category = category;
+    this.books[bookIdx].year = year;
   }
 
   // delete a Book

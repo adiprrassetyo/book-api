@@ -10,41 +10,50 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { IsUUID } from 'class-validator';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { FilterBookDto } from './dto/filter-book.dto';
+import { Book } from './entity/book.entity';
+import { UUIDValidationPipe } from 'src/pipes/uuid.validation.pipe';
 
 @Controller('books')
 export class BooksController {
   constructor(private booksService: BooksService) {}
 
-  // get All Books
+  // get Books
   @Get()
-  getBooks(@Query() filter: FilterBookDto) {
+  async getBooks(@Query() filter: FilterBookDto): Promise<Book[]> {
     return this.booksService.getBooks(filter);
   }
 
+  // get Book by id
   @Get('/:id')
-  getBook(@Param('id') id: string) {
-    return this.booksService.getBook(id);
+  async getBookById(
+    @Param('id', UUIDValidationPipe) id: string,
+  ): Promise<Book> {
+    return this.booksService.getBookById(id);
   }
 
-  // create a Book n send text success
+  // create Book
   @Post()
-  createBook(@Body() payload: CreateBookDto) {
+  async CreateBook(@Body() payload: CreateBookDto): Promise<void> {
     return this.booksService.createBook(payload);
   }
 
-  // update a Book
+  // update Book
   @Put('/:id')
-  updateBook(@Param('id') id: string, @Body() payload: UpdateBookDto) {
+  async updateBook(
+    @Param('id', UUIDValidationPipe) id: string,
+    @Body() payload: UpdateBookDto,
+  ): Promise<void> {
     return this.booksService.updateBook(id, payload);
   }
 
-  // delete a Book
+  // delete Book
   @Delete('/:id')
-  deleteBook(@Param('id') id: string) {
+  async deleteBook(@Param('id', UUIDValidationPipe) id: string): Promise<void> {
     return this.booksService.deleteBook(id);
   }
 }

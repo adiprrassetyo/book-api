@@ -1,10 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty } from 'class-validator';
 
-export class LoginDto {
+export class RefreshAccesTokenDto {
   @IsNotEmpty()
-  email: string;
-
-  @IsNotEmpty()
-  password: string;
+  refresh_token: string;
 }

@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { EntityRepository, Repository } from 'typeorm';
-import { User } from '../entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { User } from './../entity/user.entity';
 import {
   ConflictException,
   InternalServerErrorException,
@@ -28,5 +28,14 @@ export class UserRepository extends Repository<User> {
         throw new InternalServerErrorException(e);
       }
     }
+  }
+
+  async validateUser(email: string, password: string): Promise<User> {
+    const user = await this.findOne({ email });
+
+    if (user && (await user.validatePassword(password))) {
+      return user;
+    }
+    return null;
   }
 }

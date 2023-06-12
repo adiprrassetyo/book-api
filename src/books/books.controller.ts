@@ -30,21 +30,24 @@ export class BooksController {
     @Query() filter: FilterBookDto,
     @GetUser() user: User,
   ): Promise<Book[]> {
-    return this.booksService.getBooks(filter);
+    return this.booksService.getBooks(user, filter);
   }
 
-  // get Book by id
   @Get('/:id')
-  async getBookById(
+  async getBook(
+    @GetUser() user: User,
     @Param('id', UUIDValidationPipe) id: string,
   ): Promise<Book> {
-    return this.booksService.getBookById(id);
+    return this.booksService.getBookById(user, id);
   }
 
   // create Book
   @Post()
-  async CreateBook(@Body() payload: CreateBookDto): Promise<void> {
-    return this.booksService.createBook(payload);
+  async createBook(
+    @GetUser() user: User,
+    @Body() payload: CreateBookDto,
+  ): Promise<void> {
+    return this.booksService.createBook(user, payload);
   }
 
   // update Book
@@ -52,13 +55,17 @@ export class BooksController {
   async updateBook(
     @Param('id', UUIDValidationPipe) id: string,
     @Body() payload: UpdateBookDto,
+    @GetUser() user: User,
   ): Promise<void> {
-    return this.booksService.updateBook(id, payload);
+    return this.booksService.updateBook(id, user, payload);
   }
 
   // delete Book
   @Delete('/:id')
-  async deleteBook(@Param('id', UUIDValidationPipe) id: string): Promise<void> {
-    return this.booksService.deleteBook(id);
+  async deleteBook(
+    @GetUser() user: User,
+    @Param('id', UUIDValidationPipe) id: string,
+  ): Promise<void> {
+    return this.booksService.deleteBook(user, id);
   }
 }

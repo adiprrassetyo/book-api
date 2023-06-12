@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { RefreshToken } from 'src/auth/entity/refresh-token.entity';
+import { Book } from 'src/books/entity/book.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -35,4 +36,7 @@ export class User extends BaseEntity {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
   }
+
+  @OneToMany(() => Book, (book) => book.user)
+  books: Book[];
 }

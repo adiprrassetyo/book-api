@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
@@ -31,10 +32,10 @@ export class AuthService {
       throw new UnauthorizedException('Wrong email or password');
     }
 
-    const acces_token = await this.createAccesToken(user);
+    const access_token = await this.createAccesToken(user);
     const refresh_token = await this.createRefreshToken(user);
 
-    return { acces_token, refresh_token } as LoginResponse;
+    return { access_token, refresh_token } as LoginResponse;
   }
 
   async refreshAccesToken(
@@ -76,8 +77,8 @@ export class AuthService {
     const payload = {
       sub: user.id,
     };
-    const acces_token = await this.jwtService.signAsync(payload);
-    return acces_token;
+    const access_token = await this.jwtService.signAsync(payload);
+    return access_token;
   }
 
   async createRefreshToken(user: User): Promise<string> {
@@ -93,5 +94,14 @@ export class AuthService {
       refreshTokenConfig,
     );
     return refresh_token;
+  }
+
+  async revokeRefreshToken(id: string): Promise<void> {
+    const refreshToken = await this.refreshTokenRepository.findOne(id);
+    if (!refreshToken) {
+      throw new NotFoundException('Refresh token is not found');
+    }
+    refreshToken.isRevoked = true;
+    await refreshToken.save();
   }
 }

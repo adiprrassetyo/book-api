@@ -7,24 +7,29 @@ import {
   Post,
   Put,
   Query,
-  UsePipes,
-  ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { IsUUID } from 'class-validator';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { FilterBookDto } from './dto/filter-book.dto';
 import { Book } from './entity/book.entity';
 import { UUIDValidationPipe } from 'src/pipes/uuid.validation.pipe';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/users/entity/user.entity';
+import { JwtGuard } from 'src/guard/jwt.guard';
 
 @Controller('books')
+@UseGuards(JwtGuard)
 export class BooksController {
   constructor(private booksService: BooksService) {}
 
   // get Books
   @Get()
-  async getBooks(@Query() filter: FilterBookDto): Promise<Book[]> {
+  async getBooks(
+    @Query() filter: FilterBookDto,
+    @GetUser() user: User,
+  ): Promise<Book[]> {
     return this.booksService.getBooks(filter);
   }
 

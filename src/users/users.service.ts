@@ -18,4 +18,8 @@ export class UsersService {
   async validateUser(email: string, password: string): Promise<User> {
     return this.userRepository.validateUser(email, password);
   }
+
+  async findUserById(id: number): Promise<User> {
+    return this.userRepository.findOne(id);
+  }
 }
